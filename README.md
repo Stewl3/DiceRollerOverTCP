@@ -1,2 +1,2 @@
 # DiceRollerOverTCP (WORK IN PROGRESS)
-Program that rolls two dice over a TCP local host connection. 
+Program that rolls a set number of dice over a TCP local host connection. 
