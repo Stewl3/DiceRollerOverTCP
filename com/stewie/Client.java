@@ -18,6 +18,8 @@ public class Client {
             if (line.equals("roll")) {
                 System.out.print("Roll the dice? (y/n): ");
             }
+            String result = input.readUTF();
+            System.out.println(result);
 
         }
         input.close();

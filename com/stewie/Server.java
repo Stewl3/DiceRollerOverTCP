@@ -12,7 +12,7 @@ public class Server {
         System.out.println("Waiting for a client... ");
 
         var in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-//       var out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        var output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         System.out.println("Client accepted");
 
         String line = "";
@@ -24,17 +24,16 @@ public class Server {
             if (line.equals("y")) {
                 int dice1;
                 int dice2;
-                int total = 0;
+                int total;
+                String totalStr = "";
                 for (int i = 1; i <= 4; i++) {
                     dice1 = (int) (Math.random() * 6) + 1;
                     dice2 = (int) (Math.random() * 6) + 1;
                     total = (dice1 + dice2);
+                    totalStr = Integer.toString(total);
                 }
-                System.out.println(
-                        "\n"
-                        + "Roll: "
-                        + "\n"
-                        + total);
+                output.writeUTF(totalStr);
+                
             }
         }
             System.out.println("Closing connection");
