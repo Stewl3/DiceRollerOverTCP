@@ -2,46 +2,70 @@ package com.stewie;
 
 import java.net.*;
 import java.io.*;
+import java.util.Random;
 
 public class Server {
+    private DataInputStream clientIn;
+    private PrintWriter serverOut;
+    private ServerSocket serverSocket;
+    private Socket clientSocket;
 
-    public Server(int port) throws IOException {
-        var server = new ServerSocket(port);
-        var socket = server.accept();
+    public static void main(String[] args) throws IOException {
+        var server = new Server();
+        server.serverStart(5000);
+        server.serverStop();
+    }
+
+    public void serverStart(int port) throws IOException {
+        serverSocket = new ServerSocket(port);
         System.out.println("Server started");
         System.out.println("Waiting for a client... ");
-
-        var in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        var output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        clientSocket = serverSocket.accept();
         System.out.println("Client accepted");
+
+        clientIn = new DataInputStream(
+                new BufferedInputStream(clientSocket.getInputStream()));
+
+        serverOut = new PrintWriter(clientSocket.getOutputStream(), true);
+
 
         String line = "";
 
         while (!line.equalsIgnoreCase("Over")) {
-            line = in.readUTF();
+            line = clientIn.readUTF();
             System.out.println(line);
 
-            if (line.equals("y")) {
-                int dice1;
-                int dice2;
-                int total;
-                String totalStr = "";
-                for (int i = 1; i <= 4; i++) {
-                    dice1 = (int) (Math.random() * 6) + 1;
-                    dice2 = (int) (Math.random() * 6) + 1;
-                    total = (dice1 + dice2);
-                    totalStr = Integer.toString(total);
-                }
-                output.writeUTF(totalStr);
-                
+            if (isInteger(line)) {
+                int total = diceRoll(Integer.parseInt(line));
+                System.out.println("Roll: " + total);
+                serverOut.println(total);
             }
+        }}
+
+    private static int diceRoll(int numberOfDice) {
+        var random = new Random();
+        int total = 0;
+        for (int i = 0; i < numberOfDice; i++) {
+            int roll = random.nextInt(6) + 1;
+            total += roll;
         }
-            System.out.println("Closing connection");
-            socket.close();
-            in.close();
+        return total;
     }
 
-    public static void main(String[] args) throws IOException {
-        var server = new Server(5000);
+    private boolean isInteger(String string) {
+        boolean isInt = true;
+        try{
+            Integer.parseInt(string);
+        } catch (NumberFormatException e) {
+            isInt = false;
+        }
+        return isInt;
     }
+
+    private void serverStop() throws IOException {
+        System.out.println("Closing connection");
+        clientSocket.close();
+        clientIn.close();
+    }
+
 }

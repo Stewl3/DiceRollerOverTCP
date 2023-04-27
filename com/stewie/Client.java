@@ -1,36 +1,57 @@
+/* Roll Dice over TCP
+
+   Author: Stephen Stuart
+
+   Assignment: Program 1
+
+   A program that roll a set amount of dice over a TCP connection. Written in Java-JDK 19
+ */
+
+
 package com.stewie;
 
 import java.io.*;
 import java.net.*;
 
 public class Client {
-    public Client(String address, int port) throws IOException {
-        var socket = new Socket(address, port);
+    private DataInputStream userInput;
+    private BufferedReader serverInput;
+    private DataOutputStream clientOut;
+    private Socket clientSocket;
+
+    public static void main (String[]args) throws IOException {
+            var client = new Client();
+            client.startConnection("127.0.0.1", 5000);
+            client.sendMessage();
+            client.stopConnection();
+    }
+
+    private void startConnection(String address, int port) throws IOException {
+        clientSocket = new Socket(address, port);
         System.out.println("Connected");
-        var input = new DataInputStream(System.in);
-        var out = new DataOutputStream(socket.getOutputStream());
+
+        userInput = new DataInputStream(System.in);
+        clientOut = new DataOutputStream(clientSocket.getOutputStream());
+        serverInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    }
+
+    public void sendMessage() throws IOException {
 
         String line = "";
 
         while (!line.equalsIgnoreCase("Over")) {
-            line = input.readLine();
-            out.writeUTF(line);
-            if (line.equals("roll")) {
-                System.out.print("Roll the dice? (y/n): ");
-            }
-            String result = input.readUTF();
-            System.out.println(result);
+            line = userInput.readLine();
+            clientOut.writeUTF(line);
 
+            String result = serverInput.readLine();
+            System.out.println("Roll: " + result);
         }
-        input.close();
-        out.close();
-        socket.close();
     }
 
-    public static void main (String[]args) throws IOException {
-            var client = new Client("127.0.0.1", 5000);
+    private void stopConnection() throws IOException {
+        userInput.close();
+        clientOut.close();
+        clientSocket.close();
     }
+
 }
-
-
-
