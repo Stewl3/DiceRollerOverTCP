@@ -1,5 +1,7 @@
 # DiceRollerOverTCP
 <br>Primary Author: Stephen H Stuart
+<br>Secondary Author: None
+<br>
 <br>Language/package: Java/JDK-19
 <br>
 <br>Description
